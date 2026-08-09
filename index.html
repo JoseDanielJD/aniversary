@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Aniversario | JD & Grecia</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- AOS CSS for scroll animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN with Custom Config) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'muted-rose': '#E8C5C8',
+                        'champagne': '#D4AF37',
+                        'velvet': '#2B0B14',
+                        'cream': '#FAF8F5',
+                        'dark-bg': '#120508'
+                    },
+                    fontFamily: {
+                        'serif': ['"Cormorant Garamond"', 'serif'],
+                        'sans': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            background-color: #120508; /* Deep dark background */
+            color: #FAF8F5;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Particle Canvas Background */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Typography Refinements */
+        h1, h2, h3, .font-serif {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        p, .font-sans {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.8;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Intro Screen Overlay */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #2B0B14 0%, #120508 100%);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 2s ease-in-out, visibility 2s;
+        }
+        
+        .btn-enter {
+            margin-top: 2.5rem;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #D4AF37;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            white-space: normal;
+        }
+        
+        .btn-enter::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+        
+        .btn-enter:hover {
+            border-color: #D4AF37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-enter:hover::before {
+            left: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .btn-enter {
+                padding: 0.8rem 2.5rem;
+                font-size: 0.8rem;
+                letter-spacing: 3px;
+            }
+        }
+
+        /* Audio Control Button */
+        #audio-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 40;
+            background: rgba(43, 11, 20, 0.4);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            pointer-events: none;
+            color: #D4AF37;
+        }
+        
+        #audio-control.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        #audio-control:hover {
+            transform: scale(1.1) translateY(-2px);
+            background: rgba(43, 11, 20, 0.8);
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        
+        .spinning {
+            animation: spin 5s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Standard Sections */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            section {
+                padding: 6rem 2rem;
+            }
+        }
+        
+        /* Glassmorphism Panels for elegant content */
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(43, 11, 20, 0.6) 0%, rgba(18, 5, 8, 0.8) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 197, 200, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+        
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 40px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .glass-panel {
+                padding: 3rem;
+            }
+        }
+
+        .quote-mark {
+            font-size: 4rem;
+            color: #D4AF37;
+            opacity: 0.15;
+            line-height: 0;
+            vertical-align: -0.2em;
+            font-family: serif;
+        }
+
+        /* Beautiful Gradients for Texts */
+        .text-gradient {
+            background: linear-gradient(to right, #FAF8F5, #E8C5C8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #D4AF37 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 5s linear infinite;
+        }
+        
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* Subtle ambient glow */
+        .ambient-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; max-width: 800px; height: 100%; max-height: 800px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0204; }
+        ::-webkit-scrollbar-thumb { background: #2B0B14; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4a1322; }
+    </style>
+</head>
+<body class="antialiased selection:bg-champagne/30 selection:text-cream">
+
+    <!-- Audio Element for "More Than Words" Background Music -->
+    <audio id="bg-audio" loop src="https://archive.org/download/y-2mate.com-extreme-more-than-words-official-music-video/y2mate.com%20-%20Extreme%20%20More%20Than%20Words%20Official%20Music%20Video.mp3"></audio>
+
+    <!-- Canvas for Star Dust / Sparkles -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Audio Control (Appears after entering) -->
+    <button id="audio-control" aria-label="Reproducir / Pausar Música">
+        <i data-lucide="disc" class="w-6 h-6 spinning" id="audio-icon"></i>
+    </button>
+
+    <!-- Intro Screen (Overbooking Cinemático) -->
+    <div id="intro-screen">
+        <div class="text-center max-w-3xl px-6 flex flex-col items-center">
+            <h1 class="font-serif text-2xl md:text-5xl lg:text-6xl text-muted-rose font-light italic mb-10 opacity-0 transition-opacity duration-1000 tracking-wide leading-tight" id="intro-text">
+                "Un universo que comenzó<br>con un beso..."
+            </h1>
+            <button class="btn-enter opacity-0 transition-opacity duration-1000 delay-700" id="btn-enter">
+                Entrar a nuestro universo
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Layer -->
+    <main class="content-layer opacity-0 transition-opacity duration-1000" id="main-content">
+        
+        <!-- Hero Section -->
+        <section class="items-center text-center relative pt-32 pb-20">
+            <div data-aos="zoom-out" data-aos-duration="2500" class="max-w-5xl mx-auto px-4 z-10">
+                <h1 class="font-serif text-4xl md:text-7xl lg:text-8xl mb-4 text-gradient font-medium tracking-wide">
+                    Te amo de ida y vuelta,
+                </h1>
+                <h2 class="font-serif italic text-champagne font-light text-2xl md:text-6xl lg:text-7xl mt-2 mb-12">
+                    y otra vez.
+                </h2>
+                
+                <div class="flex items-center justify-center space-x-6 opacity-80 mt-8">
+                    <div class="h-[1px] w-16 md:w-24 bg-gradient-to-r from-transparent to-champagne"></div>
+                    <span class="font-sans text-muted-rose tracking-[0.4em] text-xs md:text-sm uppercase font-light">Nuestro Aniversario</span>
+                    <div class="h-[1px] w-16 md:w-24 bg-gradient-to-l from-transparent to-champagne"></div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce opacity-40">
+                <i data-lucide="chevron-down" class="text-champagne w-7 h-7"></i>
+            </div>
+        </section>
+
+        <!-- Escena I: Las Preguntas del Corazón -->
+        <section class="items-center text-center relative">
+            <div class="ambient-glow"></div>
+            <div data-aos="fade-up" data-aos-duration="1500" class="max-w-3xl mx-auto px-6 z-10">
+                <i data-lucide="heart" class="text-velvet w-8 h-8 mx-auto mb-8 opacity-50 fill-muted-rose"></i>
+                <p class="font-serif text-xl md:text-4xl text-cream italic leading-loose font-light">
+                    "Una carta, una canción, un poema, una frase, una mirada...<br><br>
+                    <span class="text-champagne">¿Qué trae el amor a nuestro corazón?</span>"
+                </p>
+            </div>
+        </section>
+
+        <!-- Escena II: En Canciones -->
+        <section class="items-center bg-velvet/10">
+            <div class="max-w-6xl mx-auto px-6 w-full">
+                <div class="flex flex-col items-center justify-center mb-20 space-y-4" data-aos="fade-in">
+                    <i data-lucide="music-4" class="text-champagne w-6 h-6 opacity-80"></i>
+                    <h2 class="font-sans text-muted-rose uppercase tracking-[0.3em] text-xs font-medium">En Canciones</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                    <!-- Tarjeta 1 -->
+                    <div data-aos="fade-up" data-aos-delay="100" class="glass-panel text-center relative group">
+                        <span class="quote-mark absolute top-6 left-6">"</span>
+                        <p class="font-serif text-xl md:text-2xl text-cream/90 italic relative z-10 pt-6 font-light leading-relaxed mb-6">
+                            ¿Quién te puso en mi camino? / ¿Quién te dijo que aún estaba vivo? / ¿Quién tuvo la brillante idea?
+                        </p>
+                    </div>
+                    
+                    <!-- Tarjeta 2 -->
+                    <div data-aos="fade-up" data-aos-delay="300" class="glass-panel text-center relative group mt-0 md:mt-12">
+                        <span class="quote-mark absolute top-6 left-6">"</span>
+                        <p class="font-serif text-xl md:text-2xl text-cream/90 italic relative z-10 pt-6 font-light leading-relaxed mb-6">
+                            Tal vez sea yo el hombre más feliz de este planeta, / si cuento con tus besos cada vez que se me antoja.
+                        </p>
+                    </div>
+                    
+                    <!-- Tarjeta 3 -->
+                    <div data-aos="fade-up" data-aos-delay="500" class="glass-panel text-center relative group">
+                        <span class="quote-mark absolute top-6 left-6">"</span>
+                        <p class="font-serif text-xl md:text-2xl text-cream/90 italic relative z-10 pt-6 font-light leading-relaxed mb-6">
+                            Y llegué a pensar que no era de este mundo, / tanto amor no se concibe en un segundo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Escena III: En Poesía -->
+        <section class="items-center relative">
+            <div class="ambient-glow" style="background: radial-gradient(circle, rgba(232, 197, 200, 0.05) 0%, transparent 60%);"></div>
+            <div class="max-w-4xl mx-auto px-6 w-full py-10 z-10">
+                <div class="flex flex-col items-center justify-center mb-24 space-y-4" data-aos="fade-in">
+                    <i data-lucide="feather" class="text-champagne w-6 h-6 opacity-80"></i>
+                    <h2 class="font-sans text-muted-rose uppercase tracking-[0.3em] text-xs font-medium">En Poesía</h2>
+                </div>
+
+                <div class="space-y-32">
+                    <!-- Poema 1 -->
+                    <div data-aos="fade-right" data-aos-duration="1200" class="text-left relative pl-8 md:pl-12">
+                        <div class="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-champagne to-transparent opacity-50"></div>
+                        <p class="font-serif text-xl md:text-4xl text-cream italic leading-relaxed font-light mb-0">
+                            «Te apago los ojos y aún puedo verte, / me tapo los oídos y aún puedo oírte, / y aun sin pies puedo caminar hacia ti, / y aun sin boca puedo invocarte.»
+                        </p>
+                    </div>
+
+                    <!-- Poema 2 -->
+                    <div data-aos="fade-left" data-aos-duration="1200" class="text-right relative pr-8 md:pr-12">
+                        <div class="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-champagne to-transparent opacity-50"></div>
+                        <p class="font-serif text-xl md:text-4xl text-cream italic leading-relaxed font-light mb-0">
+                            «Que alguien te haga sentir cosas sin ponerte un solo dedo encima, eso es magia.»
+                        </p>
+                    </div>
+
+                    <!-- Poema 3 -->
+                    <div data-aos="fade-up" data-aos-duration="1200" class="text-center mx-auto max-w-3xl pt-8">
+                        <i data-lucide="quote" class="text-champagne/20 w-12 h-12 mx-auto mb-6 rotate-180"></i>
+                        <p class="font-serif text-xl md:text-4xl text-cream italic leading-relaxed font-light mb-0">
+                            «Más que besarla, más que acostarnos juntos, más que ninguna otra cosa, ella me daba la mano y eso era amor.»
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Escena IV: El Big Bang (Nuestro Origen) -->
+        <section class="items-center bg-velvet/5 relative">
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[150%] max-w-4xl h-full bg-champagne/5 rounded-[100%] blur-[120px] pointer-events-none"></div>
+            
+            <div class="max-w-3xl mx-auto px-6 w-full text-center relative z-10" data-aos="zoom-in" data-aos-duration="2000">
+                <i data-lucide="sparkles" class="text-champagne w-10 h-10 mx-auto mb-10 animate-pulse"></i>
+                
+                <div class="space-y-10 font-sans text-sm md:text-lg text-cream/80 font-light leading-loose">
+                    <p class="text-justify md:text-center">
+                        ¿Qué evoca el sentimiento de añoranza hacia una persona? ¿Cuándo se enciende tal llama, tan cautivadora e invasiva en todo nuestro sistema nervioso? ¿Qué significa sentir el alma cuando estás con alguien?
+                    </p>
+                    <p class="text-muted-rose font-normal text-justify md:text-center text-base md:text-xl leading-relaxed italic">
+                        Pienso y pienso y no lo consigo definir... Solo recuerdo aquella noche en Jail, aquella sonrisa y una small talk... y un beso que fue como el Big Bang que creó nuestro universo. Un universo que creamos de la nada, un universo que se sentía destinado a ser. Solo pienso en eso, y lo demás es historia hasta hoy.
+                    </p>
+                    <p class="text-justify md:text-center">
+                        Que sabroso que cuando no estoy contigo, te pienso y me sonrío y guardo para mí el saber que llegaré a casa y seré feliz por tenerte de nuevo.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Escena V: La Carta de Aniversario -->
+        <section class="items-center py-20">
+            <div class="max-w-4xl mx-auto px-4 w-full" data-aos="fade-up" data-aos-duration="1500">
+                <div class="glass-panel p-6 md:p-16 relative overflow-hidden bg-velvet/40">
+                    
+                    <!-- Decoraciones de esquina lujosas -->
+                    <svg class="absolute top-4 left-4 md:top-6 md:left-6 w-8 h-8 md:w-12 md:h-12 text-champagne/30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0H100V2H2V100H0V0Z" fill="currentColor"/></svg>
+                    <svg class="absolute top-4 right-4 md:top-6 md:right-6 w-8 h-8 md:w-12 md:h-12 text-champagne/30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 0H0V2H98V100H100V0Z" fill="currentColor"/></svg>
+                    <svg class="absolute bottom-4 left-4 md:bottom-6 md:left-6 w-8 h-8 md:w-12 md:h-12 text-champagne/30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 100H100V98H2V0H0V100Z" fill="currentColor"/></svg>
+                    <svg class="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-8 h-8 md:w-12 md:h-12 text-champagne/30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 100H0V98H98V0H100V100Z" fill="currentColor"/></svg>
+                    
+                    <h2 class="font-serif text-3xl md:text-5xl text-champagne mb-8 md:mb-12 text-center italic font-medium leading-tight">
+                        ¡Feliz aniversario, amor mío!<br>
+                        <span class="text-xl md:text-3xl text-cream/70 mt-3 block font-light">Te amo mucho.</span>
+                    </h2>
+                    
+                    <div class="space-y-6 md:space-y-8 font-serif text-lg md:text-2xl text-cream/90 leading-relaxed md:leading-[2.2] text-justify md:text-center font-light">
+                        <p>
+                            Gracias por este año maravilloso, gracias por darme una familia, gracias por darme tu corazón y por darme cada día lo mejor de ti. Me siento muy feliz y orgulloso de tener a una mujer tan increíble como tú a mi lado. Lo doy todo por ser el hombre que te ame, apoye, respete, cuide y, sobre todo, donde te sientas feliz de lo que somos y de dónde estamos.
+                        </p>
+                        <p>
+                            Aún nos falta muchísimo por construir y solo quiero que seas tú la que siempre esté a mi lado haciendo todos nuestros sueños realidad, viendo a nuestra familia crecer ¡y amándonos como nunca!
+                        </p>
+                        <p class="text-champagne font-normal mt-10 text-xl md:text-3xl italic">
+                            Quiero vivir cada día junto a ti...<br class="md:hidden"> Elijo amarte cada día.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cierre Cinemático -->
+        <section class="items-center justify-center text-center min-h-[70vh] pb-32 relative">
+            <div data-aos="fade-in" data-aos-duration="3000" class="space-y-8 z-10 relative">
+                <p class="font-serif text-2xl md:text-6xl text-muted-rose italic font-light leading-snug">
+                    ¡Mi Wonder Woman, mi chiqui baby, mi Grecia Maria, te amo!
+                </p>
+                
+                <div class="pt-12">
+                    <p class="font-sans text-[10px] md:text-xs text-cream/50 tracking-[0.5em] uppercase font-light mb-4">
+                        Always yours,
+                    </p>
+                    <p class="font-serif text-5xl md:text-9xl gold-gradient font-medium pr-4">
+                        JD
+                    </p>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-cream/20 text-[9px] md:text-[10px] font-sans tracking-[0.2em] md:tracking-[0.4em] flex flex-col items-center w-full px-4 text-center">
+                <i data-lucide="infinity" class="w-5 h-5 mb-3 opacity-50"></i>
+                UN UNIVERSO solo tuyo y mio (Grecia y Jose)
+            </div>
+        </section>
+
+    </main>
+
+    <!-- AOS Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Lógica de la Aplicación -->
+    <script>
+        // Inicializar Iconos Lucide
+        lucide.createIcons();
+
+        // Inicializar Animaciones al Scroll (AOS)
+        AOS.init({
+            once: true,
+            offset: 120,
+            duration: 1000,
+            easing: 'ease-out-cubic',
+        });
+
+        // Configuración de la Pantalla de Introducción
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const introText = document.getElementById('intro-text');
+                const btnEnter = document.getElementById('btn-enter');
+                if(introText) introText.classList.remove('opacity-0');
+                if(btnEnter) btnEnter.classList.remove('opacity-0');
+            }, 800);
+        });
+
+        // ==========================================
+        // Lógica del Audio (HTML5 Audio)
+        // ==========================================
+        const audio = document.getElementById('bg-audio');
+        let isPlaying = false;
+        
+        const btnEnter = document.getElementById('btn-enter');
+        const introScreen = document.getElementById('intro-screen');
+        const mainContent = document.getElementById('main-content');
+        const audioControl = document.getElementById('audio-control');
+        const audioIcon = document.getElementById('audio-icon');
+
+        btnEnter.addEventListener('click', () => {
+            // Iniciar Audio
+            audio.play().then(() => {
+                isPlaying = true;
+            }).catch(e => {
+                console.log("Error al reproducir audio: ", e);
+            });
+
+            // Transición Cinemática
+            introScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                introScreen.style.display = 'none';
+                mainContent.classList.remove('opacity-0');
+                audioControl.classList.add('visible');
+                
+                // Refrescar AOS para detectar elementos en el viewport
+                setTimeout(() => AOS.refresh(), 100);
+                
+            }, 2000); // Duración de la transición
+        });
+
+        // Control de Reproducir/Pausar
+        audioControl.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioIcon.classList.remove('spinning');
+                audioIcon.style.opacity = '0.5';
+            } else {
+                audio.play().then(() => {
+                    audioIcon.classList.add('spinning');
+                    audioIcon.style.opacity = '1';
+                }).catch(e => console.log(e));
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // ==========================================
+        // Sistema de Partículas (Polvo de Estrellas)
+        // ==========================================
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let w, h;
+
+        function resizeCanvas() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.size = Math.random() * 1.5 + 0.2;
+                this.speedY = Math.random() * 0.2 + 0.05; // Caída muy suave
+                this.speedX = (Math.random() - 0.5) * 0.1;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                
+                // Paleta de colores: Oro Champagne, Rosa Muted, Crema
+                const colors = ['#D4AF37', '#E8C5C8', '#FAF8F5'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Velocidad de pulso de opacidad
+                this.pulseSpeed = (Math.random() * 0.02) + 0.005;
+                this.pulseDir = Math.random() > 0.5 ? 1 : -1;
+            }
+            
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                
+                // Efecto de parpadeo suave
+                this.opacity += this.pulseSpeed * this.pulseDir;
+                if(this.opacity <= 0.1) {
+                    this.opacity = 0.1;
+                    this.pulseDir = 1;
+                }
+                if(this.opacity >= 0.7) {
+                    this.opacity = 0.7;
+                    this.pulseDir = -1;
+                }
+
+                // Reciclar partículas al salir de la pantalla
+                if (this.y > h) {
+                    this.y = -10;
+                    this.x = Math.random() * w;
+                }
+                if (this.x > w) this.x = 0;
+                if (this.x < 0) this.x = w;
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Crear partículas según tamaño de pantalla
+        const particleCount = window.innerWidth < 768 ? 60 : 150;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        
+        // Iniciar animación
+        animateParticles();
+    </script>
+</body>
+</html>
