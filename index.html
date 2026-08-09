@@ -39,11 +39,15 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        body {
+        html, body {
             background-color: #120508; /* Deep dark background */
             color: #FAF8F5;
+            width: 100%;
+            max-width: 100%;
             overflow-x: hidden;
             scroll-behavior: smooth;
+            margin: 0;
+            padding: 0;
         }
 
         /* Particle Canvas Background */
@@ -70,6 +74,9 @@
         .content-layer {
             position: relative;
             z-index: 10;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         /* Intro Screen Overlay */
@@ -181,6 +188,10 @@
             flex-direction: column;
             justify-content: center;
             padding: 4rem 1rem;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 100%;
         }
         
         @media (min-width: 768px) {
